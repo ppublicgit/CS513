@@ -1,0 +1,14 @@
+.global main
+main:
+	LDR	r0, =y
+	BL	printf
+
+	MOV	r7, #0x01
+	SVC	0
+	
+.data
+x:	.asciz "Hello World\n"
+@y:	int 1
+	
+.global printf
+.global scanf	
