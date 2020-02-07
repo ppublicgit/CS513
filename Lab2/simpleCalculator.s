@@ -148,37 +148,25 @@ division:
 	POP {r1}
 	PUSH {r2}
 	PUSH {r1}
-	AND r3, r3, #0
-	PUSH {r3}
 	BL printf
-	POP {r3}
 	POP {r1}
 	POP {r2}
+	AND r3, r3, #0
 	BL divisionBySubtraction
-	PUSH {r3}
 	PUSH {r1}
+	PUSH {r3}
 	BGT overflowError
 	B printResultDivision
 
 divisionBySubtraction:
-	PUSH {r3}
-	PUSH {r2}
-	PUSH {r1}
-	LDR r0, =strDivision
-	BL printf
-	POP {r1}
-	POP {r2}
-	POP {r3}
-	@B myexit
 	ADD r3, r3, #1
-	SUBS r1, r2, r1
+	SUBS r1, r1, r2
 	CMP r1, #0
 	BGT divisionBySubtraction
+	BEQ perfectDivisor
+	SUB r3, #1
+	ADD r1, r1, r2
 	MOV PC, LR
-	@BEQ perfectDivisor
-	@SUB r3, #1
-	@ADD r1, r1, r2
-	@MOV PC, LR
 	
 perfectDivisor:
 	MOV PC, LR
@@ -328,16 +316,13 @@ strSubtraction: .asciz "(-) %d %d "
 strMultiplication: .asciz "(*) %d %d "
 
 .balign 4
-strDivision: .asciz "(/) %d %d %d \n"
+strDivision: .asciz "(/) %d %d "
 
 .balign 4
 strResult: .asciz "= %d \n"
 
 .balign 4
 strResultDivision: .asciz "= Quotient: %d and Remainder: %d\n"
-
-.balign 4
-temp:	.asciz "temp : %d %d %d \n"
 	
 .balign 4
 strInputError:	 .skip 100*4
