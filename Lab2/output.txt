@@ -1,0 +1,49 @@
+# Paul Abers
+# Simple Calculator execution and output
+# CS513 Lab 2
+
+pi@raspberrypi:~/Documents/CS513/Lab2$ ./simpleCalculator
+Thank you for using a simple calculator.
+Input first positive integer: 10
+Input second positive integer: 5
+Input operand (1:addition, 2:subtraction, 3:multiplication, 4:division): 1
+(+) 10 5 = 15 
+Continue with another calculation? 0:stop, 1:continue.
+1
+Input first positive integer: 10
+Input second positive integer: 5
+Input operand (1:addition, 2:subtraction, 3:multiplication, 4:division): 2
+(-) 10 5 = 5 
+Continue with another calculation? 0:stop, 1:continue.
+1
+Input first positive integer: 10
+Input second positive integer: 5
+Input operand (1:addition, 2:subtraction, 3:multiplication, 4:division): 3
+(*) 10 5 = 50 
+Continue with another calculation? 0:stop, 1:continue.
+1
+Input first positive integer: 10
+Input second positive integer: 5
+Input operand (1:addition, 2:subtraction, 3:multiplication, 4:division): 4
+(/) 10 5 = Quotient: 2 and Remainder: 0
+Continue with another calculation? 0:stop, 1:continue.
+1
+Input first positive integer: 10
+Input second positive integer: 20
+Input operand (1:addition, 2:subtraction, 3:multiplication, 4:division): 4
+(/) 10 20 = Quotient: 0 and Remainder: 10
+Continue with another calculation? 0:stop, 1:continue.
+1
+Input first positive integer: a
+Error reading integer 1. Must be a positive integer value between [0, 2147483647] . Please try again.
+Input first positive integer: 1
+Input second positive integer: f
+Error reading integer 2. Must be a positive integer value between [0, 2147483647] . Please try again.
+4
+Input operand (1:addition, 2:subtraction, 3:multiplication, 4:division): a
+Error reading operand. Must be 1, 2, 3, or 4. Please try again.
+3
+(*) 1 4 = 4 
+Continue with another calculation? 0:stop, 1:continue.
+0
+pi@raspberrypi:~/Documents/CS513/Lab2$ 

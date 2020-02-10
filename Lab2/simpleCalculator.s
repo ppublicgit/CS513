@@ -1,21 +1,26 @@
+@ Paul Abers
+@ Simple Calculator
+@ CS513 Lab 2
+	
+
 .global main
 
 .equ READERROR, 0
 	
 main:
 
-welcome:
+welcome: @ welcome message for user
 	LDR r0, =strWelcomePrompt
 	BL printf
 	B mainloop
 
-mainloop:
+mainloop: @ mainloop for simple calculator operation
 	BL promptInt1
 	BL promptInt2
 	BL promptOperand
 	BL handleCalculation
 
-promptInt1:
+promptInt1: @ prompt 1 to get first input integer
 	PUSH {LR}
 	LDR r0, =strIntegerPrompt1
 	BL printf
@@ -24,7 +29,7 @@ promptInt1:
 	PUSH {r1}
 	MOV PC, LR
 
-promptInt2:
+promptInt2: @ prompt 2 to get second input integer
 	PUSH {LR}
 	LDR r0, =strIntegerPrompt2
 	BL printf
@@ -33,7 +38,7 @@ promptInt2:
 	PUSH {r1}
 	MOV PC, LR
 	
-promptOperand:
+promptOperand: @ prompt to get operand for calculator
 	PUSH {LR}
 	LDR r0, =strOperandPrompt
 	BL printf
@@ -42,7 +47,7 @@ promptOperand:
 	PUSH {r1}
 	MOV PC, LR
 	
-get_int_input1:
+get_int_input1: @ get the first integer
 	PUSH {LR}
 	LDR r0, =numInputPattern
 	LDR r1, =intInput
@@ -56,7 +61,7 @@ get_int_input1:
 	POP {LR}	
 	MOV PC, LR
 
-get_int_input2:
+get_int_input2: @ get the second integer
 	PUSH {LR}
 	LDR r0, =numInputPattern
 	LDR r1, =intInput
@@ -70,7 +75,7 @@ get_int_input2:
 	POP {LR}	
 	MOV PC, LR
 
-get_operand_input:
+get_operand_input: @ get the operand integer
 	PUSH {LR}
 	LDR r0, =numInputPattern
 	LDR r1, =intInput
@@ -86,7 +91,7 @@ get_operand_input:
 	POP {LR}
 	MOV PC, LR
 
-handleCalculation:
+handleCalculation: @ handle the calculation by branchign to correct operand subprocess
 	POP {r0}
 	CMP r0, #4
 	BEQ division
@@ -97,7 +102,7 @@ handleCalculation:
 	CMP r0, #1
 	BEQ addition
 	
-addition:
+addition: @ perform addition of two integers
 	LDR r0, =strAddition
 	POP {r2}
 	POP {r1}
@@ -111,7 +116,7 @@ addition:
 	BVS overflowError
 	B printResult
 
-subtraction:
+subtraction: @ perform subtraction of two integers
 	LDR r0, =strSubtraction
 	POP {r2}
 	POP {r1}
@@ -125,7 +130,7 @@ subtraction:
 	BVS overflowError
 	B printResult
 
-multiplication:
+multiplication: @ perform multiplication of two integers
 	LDR r0, =strMultiplication
 	POP {r2}
 	POP {r1}
@@ -140,7 +145,7 @@ multiplication:
 	BGT overflowError
 	B printResult
 	
-division:
+division: @ perform division of two integers
 	LDR r0, =strDivision
 	POP {r2}
 	CMP r2, #0
@@ -158,7 +163,7 @@ division:
 	BGT overflowError
 	B printResultDivision
 
-divisionBySubtraction:
+divisionBySubtraction: @ loop for performing division by subtraction
 	ADD r3, r3, #1
 	SUBS r1, r1, r2
 	CMP r1, #0
@@ -168,10 +173,10 @@ divisionBySubtraction:
 	ADD r1, r1, r2
 	MOV PC, LR
 	
-perfectDivisor:
+perfectDivisor: @ branch to handle no remainder
 	MOV PC, LR
 	
-intReadError1:
+intReadError1: @ integer read errror for first integer input
 	LDR r0, =strErrorInt1
 	BL printf
 	LDR r0, =strInputPattern
@@ -182,7 +187,7 @@ intReadError1:
 	SUB LR, LR, #4
 	MOV PC, LR
 	
-intReadError2:
+intReadError2: @ integer read errror for second integer input
 	LDR r0, =strErrorInt2
 	BL printf
 	LDR r0, =strInputPattern
@@ -192,7 +197,7 @@ intReadError2:
 	SUB LR, LR, #4
 	MOV PC, LR
 
-intOperandError:
+intOperandError: @ operand read for operand input
 	LDR r0, =strErrorOperand
 	BL printf
 	LDR r0, =strInputPattern
@@ -202,7 +207,7 @@ intOperandError:
 	SUB LR, LR, #4
 	MOV PC, LR
 
-zeroDivisionError:
+zeroDivisionError: @ zero division error handler
 	LDR r0, =strDivisionError
 	BL printf
 	LDR r0, =strInputPattern
@@ -210,7 +215,7 @@ zeroDivisionError:
 	BL scanf
 	B continueCheck
 
-overflowError:
+overflowError: @ handle overflow error message
 	LDR r0, =strOverflowError
 	BL printf
 	LDR r0, =strInputPattern
@@ -218,7 +223,7 @@ overflowError:
 	BL scanf
 	B printResult
 
-continueCheckError:
+continueCheckError: @ handle incorrect continue flag 
 	LDR r0, =strContinueCheckError
 	BL printf
 	LDR r0, =strInputPattern
@@ -226,7 +231,7 @@ continueCheckError:
 	BL scanf
 	B continueCheck
 
-continueCheck:
+continueCheck: @ continue using check 
 	LDR r0, =strContinueCheck
 	BL printf
 	LDR r0, =numInputPattern
@@ -238,27 +243,27 @@ continueCheck:
 	LDR r1, [r1]
 	B handleContinue
 
-handleContinue:	
+handleContinue:	@ branch back to the mainloop to continue using simple calculator
 	CMP r1, #0
 	BEQ myexit
 	CMP r1, #1
 	BEQ mainloop
 	B continueCheckError
 	
-printResult:
+printResult: @ print result of calculation
 	LDR r0, =strResult
 	POP {r1}
 	BL printf
 	B continueCheck
 
-printResultDivision:
+printResultDivision: @ print result for division of calculation
 	LDR r0, =strResultDivision
 	POP {r1}
 	POP {r2}
 	BL printf
 	B continueCheck
 	
-myexit:
+myexit: @ exit the program
 	MOV r7, #0x01
 	SVC 0
 		
