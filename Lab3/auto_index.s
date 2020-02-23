@@ -31,16 +31,16 @@ B:  .word 10
     .word -10
     .word -100
 
-C:  .word 0
-    .word 0
-    .word 0
-    .word 0
-    .word 0
-    .word 0
-    .word 0
-    .word 0
-    .word 0
-    .word 0
+C:  .word 100
+    .word 200
+    .word 300
+    .word 400
+    .word 500
+    .word 600
+    .word 700
+    .word 800
+    .word 900
+    .word 1000
 
 
 main:
@@ -71,6 +71,9 @@ printarrays:    @print arrays
     POP {r0, r1, r2, r5}
     PUSH {r0, r1, r2, r5}
     BL calcC
+    POP {r0, r1, r2, r5}
+    MOV r5, #Len
+    PUSH {r0, r1, r2 ,r5}
     BL printC @branch to print array C
     POP {r0, r1, r2, r5}
     POP {lr}
@@ -158,19 +161,19 @@ printArray: @print array
     POP {lr}
     MOV pc, lr
 
-
-
-calcC: @calc c with for loop for iterating through arrays
+calcC: @calc c with for loop for iterating @through arrays
     LDR r3, [r0, #4]! @get element of A
     LDR r4, [r1, #4]! @get element of B
     ADD r3, r3, r4 @add two elements
-    STR r3, [r2, #4]! @store result in C
+    @STR r3, [r2, #4]! @store result in C
     SUBS r5, r5, #1 @test for end of loop
     BNE calcC @repeat until done
+    MOV pc, lr
 
 userInput: @get user input for z/p/n
     PUSH {lr} @push lr to stack
     PUSH {r0, r1, r2, r5} @push registers to stack
+
     LDR r0, =userInputMsg  @message to print
     BL printf @print message
     LDR r0, =numInputPattern @scanf pattern
@@ -178,19 +181,25 @@ userInput: @get user input for z/p/n
 	BL scanf @get user input
 	cmp r0, #READERROR @check for readerror
 	BEQ intInputError @branch if read error
+
+    LDR r1, =intInput
+	LDR r1, [r1]
+
     CMP r1, #0 @check for valid integer
 	BLT intInputError @branch if invalid
 	CMP r1, #2 @ check for valid input
 	BGT intInputError @branch if invalid
-    cmp r1, #1 @compare user input with 1
-    BLT printZero @print zero chosen
-    BGT printNeg @print neg chosen
-    BL printPos @print pos chosen
+
+    CMP r1, #1 @compare user input with 1
+    POP {r0, r1, r2, r5}
+    BLEQ printZero @print zero chosen
+    @BLEQ printNeg @print neg chosen
+    @BLEQ printPos @print pos chosen
     POP {lr}
     MOV pc, lr
 
 printZero:  @print zero values
-    LDR r0, =strZeroChosen
+    LDR r0, =strPosChosen
     BL printf
     POP {r0, r1, r2, r5}
     PUSH {lr}
@@ -231,18 +240,21 @@ printValue:  @print value
     MOV pc, lr
 
 loopForZero: @loop over C and print zeros
+    PUSH {lr}
     LDR r3, [r2, #4]! @get element of C
     CMP r3, #0
-    BLEQ printValue
+    @BLEQ printValue
+    POP {lr}
     SUBS r5, r5, #1 @test for end of loop
     BNE loopForZero @repeat until done
-    POP {lr}
     MOV pc, lr
 
 loopForPos: @loop over C and print positives
+    PUSH {lr}
     LDR r3, [r2, #4]! @get element of C
     CMP r3, #0
     BLGT printValue
+    POP {lr}
     SUBS r5, r5, #1 @test for end of loop
     BNE loopForPos @repeat until done
     POP {lr}
