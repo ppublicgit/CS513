@@ -9,38 +9,7 @@
 
 .equ Len, 10 @length of arrays as 10
 
-A:  .word 24
-    .word -1
-    .word 61
-    .word -95
-    .word 5
-    .word 59
-    .word -23
-    .word -12
-    .word 259
-    .word 614
 
-B:  .word 10
-    .word 32
-    .word -763
-    .word 2351
-    .word 87
-    .word -24
-    .word 0
-    .word 12
-    .word -10
-    .word -100
-
-C:  .word 100
-    .word 200
-    .word 300
-    .word 400
-    .word 500
-    .word 600
-    .word 700
-    .word 800
-    .word 900
-    .word 1000
 
 
 main:
@@ -51,9 +20,12 @@ welcome: @ welcome message for user
 	B mainloop
 
 mainloop: @ main loop that runs the code
-    ADR r0, A-4 @register r0 points at array A
-    ADR r1, B-4 @register r1 points at array B
-    ADR r2, C-4 @register r2 points at array C
+    LDR r0, =A@-4 @register r0 points at array A
+    LDR r1, =B@-4 @register r1 points at array B
+    LDR r2, =C@-4 @register r2 points at array C
+    ADD r0, #-4
+    ADD r1, #-4
+    ADD r2, #-4
     MOV r5, #Len @register r5 is loop counter
     BL printarrays
     BL userInput
@@ -165,7 +137,7 @@ calcC: @calc c with for loop for iterating @through arrays
     LDR r3, [r0, #4]! @get element of A
     LDR r4, [r1, #4]! @get element of B
     ADD r3, r3, r4 @add two elements
-    @STR r3, [r2, #4]! @store result in C
+    STR r3, [r2, #4]! @store result in C
     SUBS r5, r5, #1 @test for end of loop
     BNE calcC @repeat until done
     MOV pc, lr
@@ -190,19 +162,22 @@ userInput: @get user input for z/p/n
 	CMP r1, #2 @ check for valid input
 	BGT intInputError @branch if invalid
 
-    CMP r1, #1 @compare user input with 1
-    POP {r0, r1, r2, r5}
+    CMP r1, #0 @compare user input with 1
     BLEQ printZero @print zero chosen
-    @BLEQ printNeg @print neg chosen
-    @BLEQ printPos @print pos chosen
+    CMP r1, #2
+    BLEQ printNeg @print neg chosen
+    CMP r1, #1
+    BLEQ printPos @print pos chosen
     POP {lr}
     MOV pc, lr
 
 printZero:  @print zero values
-    LDR r0, =strPosChosen
-    BL printf
     POP {r0, r1, r2, r5}
     PUSH {lr}
+    PUSH {r0, r1, r2, r5}
+    LDR r0, =strZeroChosen
+    BL printf
+    POP {r0, r1, r2, r5}
     BL loopForZero
     LDR r0, =printEndLine
     BL printf
@@ -210,10 +185,12 @@ printZero:  @print zero values
     MOV pc, lr
 
 printPos:  @print positive values
+    POP {r0, r1, r2, r5}
+    PUSH {lr}
+    PUSH {r0, r1, r2, r5}
     LDR r0, =strPosChosen
     BL printf
     POP {r0, r1, r2, r5}
-    PUSH {lr}
     BL loopForPos
     LDR r0, =printEndLine
     BL printf
@@ -221,10 +198,12 @@ printPos:  @print positive values
     MOV pc, lr
 
 printNeg:  @print negative values
+    POP {r0, r1, r2, r5}
+    PUSH {lr}
+    PUSH {r0, r1, r2, r5}
     LDR r0, =strNegChosen
     BL printf
     POP {r0, r1, r2, r5}
-    PUSH {lr}
     BL loopForNeg
     LDR r0, =printEndLine
     BL printf
@@ -242,8 +221,10 @@ printValue:  @print value
 loopForZero: @loop over C and print zeros
     PUSH {lr}
     LDR r3, [r2, #4]! @get element of C
+    PUSH {r2}
     CMP r3, #0
-    @BLEQ printValue
+    BLEQ printValue
+    POP {r2}
     POP {lr}
     SUBS r5, r5, #1 @test for end of loop
     BNE loopForZero @repeat until done
@@ -252,21 +233,25 @@ loopForZero: @loop over C and print zeros
 loopForPos: @loop over C and print positives
     PUSH {lr}
     LDR r3, [r2, #4]! @get element of C
+    PUSH {r2, r5}
     CMP r3, #0
     BLGT printValue
+    POP {r2, r5}
     POP {lr}
     SUBS r5, r5, #1 @test for end of loop
     BNE loopForPos @repeat until done
-    POP {lr}
     MOV pc, lr
 
 loopForNeg: @loop over C and print negatives
+    PUSH {lr}
     LDR r3, [r2, #4]! @get element of C
+    PUSH {r2, r5}
     CMP r3, #0
     BLLT printValue
+    POP {r2, r5}
+    POP {lr}
     SUBS r5, r5, #1 @test for end of loop
     BNE loopForNeg @repeat until done
-    POP {lr}
     MOV pc, lr
 
 intInputError: @ operand read for operand input
@@ -328,19 +313,23 @@ strErrorInput:  .asciz "Error. Invalid integer entered for which elements of arr
 strInputError:	 .skip 100*4
 
 .balign 4
-strZeroChosen:    .asciz "Printing Zero values: "
+strZeroChosen:    .asciz "Printing Zero values: \n"
 
 .balign 4
-strPosChosen:    .asciz "Printing Pos values: "
+strPosChosen:    .asciz "Printing Pos values: \n"
 
 .balign 4
-strNegChosen:    .asciz "Printing Neg values: "
+strNegChosen:    .asciz "Printing Neg values: \n"
 
 .balign 4
 printVal:   .asciz "%d "
 
 .balign 4
 printEndLine:   .asciz "\n"
+
+A:  .word 24, -1, 61, -95, 5, 59, -23, -12, 259, 614
+B:  .word 10, 32, -763, 2351, 87, -24, 0, 12, 259, 614
+C:  .word 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 .global printf
 .global scanf
