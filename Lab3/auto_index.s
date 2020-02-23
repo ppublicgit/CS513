@@ -23,9 +23,9 @@ mainloop: @ main loop that runs the code
     LDR r0, =A@-4 @register r0 points at array A
     LDR r1, =B@-4 @register r1 points at array B
     LDR r2, =C@-4 @register r2 points at array C
-    ADD r0, #-4
-    ADD r1, #-4
-    ADD r2, #-4
+    ADD r0, #-4 @point before array A to allow preindexing auto indexing
+    ADD r1, #-4 @point before array B to allow preindexing auto indexing
+    ADD r2, #-4 @point before array C to allow preindexing auto indexing
     MOV r5, #Len @register r5 is loop counter
     BL printarrays
     BL userInput
@@ -133,7 +133,7 @@ printArray: @print array
     POP {lr}
     MOV pc, lr
 
-calcC: @calc c with for loop for iterating @through arrays
+calcC: @calc c with for loop for iterating through arrays
     LDR r3, [r0, #4]! @get element of A
     LDR r4, [r1, #4]! @get element of B
     ADD r3, r3, r4 @add two elements
@@ -210,7 +210,7 @@ printNeg:  @print negative values
     POP {lr}
     MOV pc, lr
 
-printValue:  @print value
+printValue:  @print a single value stored in r3
     MOV r1, r3 @load r1 with register 3
     LDR r0, =printVal
     PUSH {lr}
@@ -254,7 +254,7 @@ loopForNeg: @loop over C and print negatives
     BNE loopForNeg @repeat until done
     MOV pc, lr
 
-intInputError: @ operand read for operand input
+intInputError: @ input read error for z/p/n input
 	LDR r0, =strErrorInput @error message
 	BL printf @print error message
 	LDR r0, =strInputPattern
