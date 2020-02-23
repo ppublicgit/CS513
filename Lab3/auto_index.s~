@@ -1,0 +1,17 @@
+@ Paul Abers
+@ Simple Calculator
+@ CS513 Lab 2
+
+
+.global main
+
+main:
+
+welcome: @ welcome message for user
+	LDR r0, =strWelcomePrompt
+	BL printf
+	B mainloop
+
+.data
+.balign 4
+strInputPattern: .asciz "%[^\n]"
