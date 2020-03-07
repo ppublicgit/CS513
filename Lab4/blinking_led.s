@@ -1,0 +1,270 @@
+@ File: blinking_leds.s
+@ Author: Paul Abers
+
+OUTPUT = 1 @ Used to set the selected GPIO pins to output only
+
+.text
+.global main
+
+main:
+
+welcome: @ welcome message for user
+    LDR r0, =strWelcomePrompt
+    BL printf
+    B mainloop
+
+mainloop:   @main loop for running code
+    BL setup
+    BL blink
+    BL loop
+    BL allOff
+    BL blink
+    B exit
+
+setup:  @setup GPIO pins
+    PUSH {lr}
+    BL wiringPiSetup
+    MOV r1, #-1
+    CMP r0, r1
+    BNE init @everything is ok so continue code
+    LDR r0, =ErrMsg
+    BL printf
+    B exit @ there is a problem with the GPIO exit code
+
+init:   @setup gpio pins to mode output
+    @ setup pin 2
+    LDR r0, =pin2
+    LDR r0, [r0]
+    MOV r1, #OUTPUT
+    BL pinMode
+    @ setup pin 3
+    LDR r0, =pin3
+    LDR r0, [r0]
+    MOV r1, #OUTPUT
+    BL pinMode
+    @ setup pin 4
+    LDR r0, =pin4
+    LDR r0, [r0]
+    MOV r1, #OUTPUT
+    BL pinMode
+    @ setup pin 5
+    LDR r0, =pin5
+    LDR r0, [r0]
+    MOV r1, #OUTPUT
+    BL pinMode
+    POP {pc} @ return to main loop
+
+blink:  @flash leds on and then off
+    PUSH {lr}
+    BL allOn
+    BL allOff
+    POP {pc}
+
+allOn:   @all leds on
+    PUSH {lr}
+    LDR r0, =pin2
+    LDR r0, [r0]
+    MOV r1, #1
+    BL digitalWrite
+    LDR r0, =pin3
+    LDR r0, [r0]
+    MOV r1, #1
+    BL digitalWrite
+    LDR r0, =pin4
+    LDR r0, [r0]
+    MOV r1, #1
+    BL digitalWrite
+    LDR r0, =pin5
+    LDR r0, [r0]
+    MOV r1, #1
+    BL digitalWrite
+    LDR r0, =delayMs
+    LDR r0, [r0]
+    BL delay
+    POP {pc}
+
+allOff:  @all leds off
+    PUSH {lr}
+    LDR r0, =pin2
+    LDR r0, [r0]
+    MOV r1, #0
+    BL digitalWrite
+    LDR r0, =pin3
+    LDR r0, [r0]
+    MOV r1, #0
+    BL digitalWrite
+    LDR r0, =pin4
+    LDR r0, [r0]
+    MOV r1, #0
+    BL digitalWrite
+    LDR r0, =pin5
+    LDR r0, [r0]
+    MOV r1, #0
+    BL digitalWrite
+    LDR r0, =delayMs
+    LDR r0, [r0]
+    BL delay
+    POP {pc}
+
+pin2On:  @turn pin 2 on
+    LDR r0, =pin2
+    LDR r0, [r0]
+    MOV r1, #1
+    MOV pc, lr
+
+pin2Off:  @turn pin 2 off
+    LDR r0, =pin2
+    LDR r0, [r0]
+    MOV r1, #0
+    MOV pc, lr
+
+pin3On:  @turn pin 3 on
+    LDR r0, =pin3
+    LDR r0, [r0]
+    MOV r1, #1
+    MOV pc, lr
+
+pin3Off:  @turn pin 3 off
+    LDR r0, =pin3
+    LDR r0, [r0]
+    MOV r1, #0
+    MOV pc, lr
+
+pin4On:  @turn pin 4 on
+    LDR r0, =pin4
+    LDR r0, [r0]
+    MOV r1, #1
+    MOV pc, lr
+
+pin4Off:  @turn pin 4 off
+    LDR r0, =pin4
+    LDR r0, [r0]
+    MOV r1, #0
+    MOV pc, lr
+
+pin5On:  @turn pin 5 on
+    LDR r0, =pin5
+    LDR r0, [r0]
+    MOV r1, #1
+    MOV pc, lr
+
+pin5Off:  @turn pin 5 off
+    LDR r0, =pin5
+    LDR r0, [r0]
+    MOV r1, #0
+    MOV pc, lr
+
+delayLED:  @delay input to allow led to respond
+    PUSH {lr}
+    LDR r0, =delayMs
+    LDR r0, [r0]
+    BL delay
+    POP {pc}
+
+loop:   @setup looping for counting
+    PUSH {lr}
+    LDR r0, =strCountStarted
+    BL printf
+    BL handleCount
+    LDR r0, =strCountFinished
+    BL printf
+    BL handleCount
+    LDR r0, =strCountFinished
+    BL printf
+    BL handleCount
+    LDR r0, =strCountFinished
+    BL printf
+    POP {pc}
+
+handleCount: @handle count
+    PUSH {lr}
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    BL pin2Off
+    BL pin3On
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    BL pin2Off
+    BL pin3Off
+    BL pin4On
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    BL pin3On
+    BL pin2Off
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    BL pin2Off
+    BL pin3Off
+    BL pin4Off
+    BL pin5On
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    BL pin2Off
+    BL pin3On
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    BL pin2Off
+    BL pin3Off
+    BL pin4On
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    BL pin3On
+    BL pin2Off
+    BL delayLED
+    BL pin2On
+    BL delayLED
+    POP {pc}
+
+success:    @ print successful finish message
+    LDR r0, =strSuccess
+    BL printf
+
+exit:   @ exit code gracefully
+    MOV r0, r8
+    MOV r7, #0X01
+    SVC 0
+
+@ data
+.data
+
+.balign 4
+
+pin2:    .word 2
+pin3:    .word 3
+pin4:    .word 4
+pin5:    .word 5
+
+i:  .word 0 @counter for loop
+delayMs:     .word 1000 @set delay to one second
+
+.balign 4
+strWelcomePrompt:    .asciz "Raspberry Pi Blinking Light with Assembly. This blinks the LEDs. First all LEDs will blink once. Then the LEDs will count from 0 to F three times. Then all LEDs will turn off. Last the LEDs will blink one more time.\n"
+
+.balign 4
+ErrMsg:  .asciz "Setup did not work... Aborting...\n"
+
+.balign 4
+strSuccess:    .asciz "Code completed. Exiting gracefully...\n"
+
+.balign 4
+strCountFinished:    .asciz "Count finished.\n"
+
+.balign 4
+strCountStarted:    .asciz "Count started.\n"
+
+.global printf
+
+@ from wiringPi.h
+.extern wiringPiSetup
+.extern delay
+.extern digitalWrite
+.extern pinMode
+
+@ end of code
