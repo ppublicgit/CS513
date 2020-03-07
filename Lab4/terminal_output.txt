@@ -1,0 +1,6 @@
+pi@raspberrypi:~/Documents/CS513/Lab4 $ ./a.out
+Raspberry Pi Blinking Light with Assembly. This blinks the LEDs. First all LEDs will blink once. Then the LEDs will count from 0 to F three times. Then all LEDs will turn off. Last the LEDs will blink one more time.
+Count started.
+Count finished.
+Count finished.
+Count finished.
